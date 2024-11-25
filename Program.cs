@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace RealTimeNotification
 {
@@ -19,21 +20,54 @@ namespace RealTimeNotification
         public event EventHandler<LoginEventArgs> AdminLoginSuccess;
         public event EventHandler<LoginEventArgs> UserLoginSuccess;
 
-        public void Login(string username, string password)
+        private int failedAttempts = 0; 
+        private int timeout = 0; 
+
+        public void Login()
         {
-            if (username == "admin" && password == "admin123")
+            while (true)
             {
-                Console.WriteLine("Admin login successful.");
-                OnAdminLoginSuccess(new LoginEventArgs("Admin login successful."));
-            }
-            else if (username == "user" && password == "userpassword")
-            {
-                Console.WriteLine("User login successful.");
-                OnUserLoginSuccess(new LoginEventArgs("User login successful."));
-            }
-            else
-            {
-                Console.WriteLine("Invalid username or password.");
+                if (timeout > 0)
+                {
+                    Console.WriteLine($"Too many failed attempts. Please wait {timeout} seconds...");
+                    Thread.Sleep(timeout * 1000);
+                    timeout = 0;
+                }
+
+                Console.Write("Enter username: ");
+                string username = Console.ReadLine();
+                Console.Write("Enter password: ");
+                string password = Console.ReadLine();
+
+                if (username == "admin" && password == "admin123")
+                {
+                    Console.WriteLine("Admin login successful.");
+                    OnAdminLoginSuccess(new LoginEventArgs("Admin login successful."));
+                    failedAttempts = 0; 
+                    break;
+                }
+                else if (username == "user" && password == "userpassword")
+                {
+                    Console.WriteLine("User login successful.");
+                    OnUserLoginSuccess(new LoginEventArgs("User login successful."));
+                    failedAttempts = 0; 
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid username or password.\n");
+                    failedAttempts++;
+
+                    if (failedAttempts == 3)
+                    {
+                        timeout = 30; 
+                    }
+                    else if (failedAttempts == 6)
+                    {
+                        timeout = 60; 
+                        failedAttempts = 0; 
+                    }
+                }
             }
         }
 
@@ -90,12 +124,7 @@ namespace RealTimeNotification
             loginManager.AdminLoginSuccess += logger.HandleAdminLoginSuccess;
             loginManager.UserLoginSuccess += logger.HandleUserLoginSuccess;
 
-            Console.Write("Enter username: ");
-            string username = Console.ReadLine();
-            Console.Write("Enter password: ");
-            string password = Console.ReadLine();
-
-            loginManager.Login(username, password);
+            loginManager.Login();
 
             Console.ReadLine();
         }
