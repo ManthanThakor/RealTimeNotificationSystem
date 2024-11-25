@@ -6,18 +6,23 @@ namespace RealTimeNotification
 
     public class LoginManager
     {
-        public event LoginEvent AdminLoginSuccess;
-        public event LoginEvent UserLoginSuccess;
+        public event LoginEvent adminloginsuccess;
+        public event LoginEvent userloginsuccess;
 
         public void Login(string username, string password)
         {
-            if (username = "admin" && password = "admin123")
+            if (username == "admin" && password == "admin123")
             {
                 Console.WriteLine("Admin login successful.");
+                NotifyAdminLoginSuccess("Admin login successful.");
+
             }
             else if (username == "user" && password == "userpassword")
             {
                 Console.WriteLine("User login successful.");
+
+                NotifyUserLoginSuccess("User login successful.");
+
             }
             else
             {
@@ -27,24 +32,24 @@ namespace RealTimeNotification
 
         protected virtual void NotifyAdminLoginSuccess(string message)
         {
-            AdminLoginSuccess?.Invoke(message);
+            adminloginsuccess?.Invoke(message);
         }
         protected virtual void NotifyUserLoginSuccess(string message)
         {
-            UserLoginSuccess?.Invoke(message);
+            userloginsuccess?.Invoke(message);
         }
     }
 
-    public class UIComponent
+    public class NotificationMessage
     {
-        public void onAdminLoginSuccess(string message)
+        public void OnAdminLoginSuccess(string message)
         {
-            Console.WriteLine($"UI Notification: {message}");
+            Console.WriteLine($"Notification: {message}");
         }
 
-        public void onUserLogin(string message)
+        public void OnUserLoginSuccess(string message)
         {
-            Console.WriteLine($"UI Notification: {message}");
+            Console.WriteLine($"Notification: {message}");
         }
     }
 
@@ -66,7 +71,25 @@ namespace RealTimeNotification
         {
             Console.WriteLine("\n Real Time Notification \n");
 
+            LoginManager loginManager = new LoginManager();
+            NotificationMessage notificationMessage = new NotificationMessage();
+            Logger logger = new Logger();
 
+
+
+            loginManager.adminloginsuccess += notificationMessage.OnAdminLoginSuccess;
+            loginManager.userloginsuccess += notificationMessage.OnUserLoginSuccess;
+
+            loginManager.adminloginsuccess += logger.OnAdminLoginSuccess;
+            loginManager.userloginsuccess += logger.OnUserLoginSuccess;
+
+            Console.Write("Enter username: ");
+            string username = Console.ReadLine();
+            Console.Write("Enter password: ");
+            string password = Console.ReadLine();
+
+            // Perform login and notify if successful
+            loginManager.Login(username, password);
             Console.ReadLine();
         }
     }
