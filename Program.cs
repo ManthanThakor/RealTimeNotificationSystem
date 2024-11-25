@@ -2,27 +2,34 @@
 
 namespace RealTimeNotification
 {
-    public delegate void LoginEvent(string message);
+    public class LoginEventArgs : EventArgs
+    {
+        public string Message { get; }
+        public DateTime Timestamp { get; }
+
+        public LoginEventArgs(string message)
+        {
+            Message = message;
+            Timestamp = DateTime.Now;
+        }
+    }
 
     public class LoginManager
     {
-        public event LoginEvent adminloginsuccess;
-        public event LoginEvent userloginsuccess;
+        public event EventHandler<LoginEventArgs> AdminLoginSuccess;
+        public event EventHandler<LoginEventArgs> UserLoginSuccess;
 
         public void Login(string username, string password)
         {
             if (username == "admin" && password == "admin123")
             {
                 Console.WriteLine("Admin login successful.");
-                NotifyAdminLoginSuccess("Admin login successful.");
-
+                OnAdminLoginSuccess(new LoginEventArgs("Admin login successful."));
             }
             else if (username == "user" && password == "userpassword")
             {
                 Console.WriteLine("User login successful.");
-
-                NotifyUserLoginSuccess("User login successful.");
-
+                OnUserLoginSuccess(new LoginEventArgs("User login successful."));
             }
             else
             {
@@ -30,38 +37,40 @@ namespace RealTimeNotification
             }
         }
 
-        protected virtual void NotifyAdminLoginSuccess(string message)
+        protected virtual void OnAdminLoginSuccess(LoginEventArgs e)
         {
-            adminloginsuccess?.Invoke(message);
+            AdminLoginSuccess?.Invoke(this, e);
         }
-        protected virtual void NotifyUserLoginSuccess(string message)
+
+        protected virtual void OnUserLoginSuccess(LoginEventArgs e)
         {
-            userloginsuccess?.Invoke(message);
+            UserLoginSuccess?.Invoke(this, e);
         }
     }
 
     public class NotificationMessage
     {
-        public void OnAdminLoginSuccess(string message)
+        public void HandleAdminLoginSuccess(object sender, LoginEventArgs e)
         {
-            Console.WriteLine($"Notification: {message}");
+            Console.WriteLine($"UI Notification: {e.Message} (Timestamp: {e.Timestamp})");
         }
 
-        public void OnUserLoginSuccess(string message)
+        public void HandleUserLoginSuccess(object sender, LoginEventArgs e)
         {
-            Console.WriteLine($"Notification: {message}");
+            Console.WriteLine($"UI Notification: {e.Message} (Timestamp: {e.Timestamp})");
         }
     }
 
     public class Logger
-    { 
-        public void OnAdminLoginSuccess(string message)
+    {
+        public void HandleAdminLoginSuccess(object sender, LoginEventArgs e)
         {
-            Console.WriteLine($"Logger: Admin login event logged - {message}");
+            Console.WriteLine($"Logger: Admin login event logged - {e.Message} (Timestamp: {e.Timestamp})");
         }
-        public void OnUserLoginSuccess(string message)
+
+        public void HandleUserLoginSuccess(object sender, LoginEventArgs e)
         {
-            Console.WriteLine($"Logger: User login event logged - {message}");
+            Console.WriteLine($"Logger: User login event logged - {e.Message} (Timestamp: {e.Timestamp})");
         }
     }
 
@@ -75,23 +84,20 @@ namespace RealTimeNotification
             NotificationMessage notificationMessage = new NotificationMessage();
             Logger logger = new Logger();
 
+            loginManager.AdminLoginSuccess += notificationMessage.HandleAdminLoginSuccess;
+            loginManager.UserLoginSuccess += notificationMessage.HandleUserLoginSuccess;
 
-
-            loginManager.adminloginsuccess += notificationMessage.OnAdminLoginSuccess;
-            loginManager.userloginsuccess += notificationMessage.OnUserLoginSuccess;
-
-            loginManager.adminloginsuccess += logger.OnAdminLoginSuccess;
-            loginManager.userloginsuccess += logger.OnUserLoginSuccess;
+            loginManager.AdminLoginSuccess += logger.HandleAdminLoginSuccess;
+            loginManager.UserLoginSuccess += logger.HandleUserLoginSuccess;
 
             Console.Write("Enter username: ");
             string username = Console.ReadLine();
             Console.Write("Enter password: ");
             string password = Console.ReadLine();
 
-            // Perform login and notify if successful
             loginManager.Login(username, password);
+
             Console.ReadLine();
         }
     }
 }
-
