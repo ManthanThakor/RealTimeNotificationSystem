@@ -2,6 +2,7 @@
 
 namespace RealTimeNotification
 {
+    // Custom EventArgs class to carry the message and timestamp
     public class LoginEventArgs : EventArgs
     {
         public string Message { get; }
