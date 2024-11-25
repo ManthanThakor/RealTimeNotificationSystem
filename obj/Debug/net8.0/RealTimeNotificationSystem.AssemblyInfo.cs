@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RealTimeNotificationSystem")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8478e98895af34c24881b1c3e3a19193c520d052")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b5e916c1bb1c20f425fec89f305e4c53e0f7cc3c")]
 [assembly: System.Reflection.AssemblyProductAttribute("RealTimeNotificationSystem")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RealTimeNotificationSystem")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
