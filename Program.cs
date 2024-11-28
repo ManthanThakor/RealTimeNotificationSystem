@@ -42,7 +42,7 @@ namespace RealTimeNotification
                 if (username == "admin" && password == "admin123")
                 {
                     Console.WriteLine("Admin login successful.");
-                    OnAdminLoginSuccess(new LoginEventArgs("Admin login successful."));
+                    OnAdminLoginSuccess("Admin login successful.");
                     failedAttempts = 0; 
                     break;
                 }
@@ -71,9 +71,10 @@ namespace RealTimeNotification
             }
         }
 
-        protected virtual void OnAdminLoginSuccess(LoginEventArgs e)
+        protected virtual void OnAdminLoginSuccess(string message)
         {
-            AdminLoginSuccess?.Invoke(this, e);
+            LoginEventArgs arg = new LoginEventArgs(message);
+            AdminLoginSuccess?.Invoke(this, arg);
         }
 
         protected virtual void OnUserLoginSuccess(LoginEventArgs e)
